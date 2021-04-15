@@ -66,3 +66,7 @@ colinearity_check\.csv
 .idea
 **.idea/**
 .vs/**
+
+#Jupyter Notebooks
+.ipynb_checkpoints
+**/.ipynb_checkpoints
