@@ -58,3 +58,11 @@ docs/_build/
 target/
 
 colinearity_check\.csv
+
+#Mac & Pycharm stuff
+.DS_Store
+**/.DS_Store
+*.iml
+.idea
+**.idea/**
+.vs/**

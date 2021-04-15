@@ -1,0 +1,1107 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "arbitrary-bangkok",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import os\n",
+    "import sys\n",
+    "import numpy as np\n",
+    "import pandas as pd\n",
+    "import seaborn as sns\n",
+    "import sklearn\n",
+    "import scipy\n",
+    "\n",
+    "import matplotlib\n",
+    "import matplotlib.pyplot as plt\n",
+    "%matplotlib inline\n",
+    "\n",
+    "import toolbelt"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "id": "characteristic-filename",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.read_csv('./titanic/train.csv', index_col='PassengerId')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "id": "chicken-revolution",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Survived</th>\n",
+       "      <th>Pclass</th>\n",
+       "      <th>Name</th>\n",
+       "      <th>Sex</th>\n",
+       "      <th>Age</th>\n",
+       "      <th>SibSp</th>\n",
+       "      <th>Parch</th>\n",
+       "      <th>Ticket</th>\n",
+       "      <th>Fare</th>\n",
+       "      <th>Cabin</th>\n",
+       "      <th>Embarked</th>\n",
+       "      <th>no_cabin</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>PassengerId</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>0</td>\n",
+       "      <td>3</td>\n",
+       "      <td>Braund, Mr. Owen Harris</td>\n",
+       "      <td>male</td>\n",
+       "      <td>22.0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>A/5 21171</td>\n",
+       "      <td>7.2500</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>S</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>1</td>\n",
+       "      <td>1</td>\n",
+       "      <td>Cumings, Mrs. John Bradley (Florence Briggs Th...</td>\n",
+       "      <td>female</td>\n",
+       "      <td>38.0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>PC 17599</td>\n",
+       "      <td>71.2833</td>\n",
+       "      <td>C85</td>\n",
+       "      <td>C</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>1</td>\n",
+       "      <td>3</td>\n",
+       "      <td>Heikkinen, Miss. Laina</td>\n",
+       "      <td>female</td>\n",
+       "      <td>26.0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>STON/O2. 3101282</td>\n",
+       "      <td>7.9250</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>S</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>1</td>\n",
+       "      <td>1</td>\n",
+       "      <td>Futrelle, Mrs. Jacques Heath (Lily May Peel)</td>\n",
+       "      <td>female</td>\n",
+       "      <td>35.0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>113803</td>\n",
+       "      <td>53.1000</td>\n",
+       "      <td>C123</td>\n",
+       "      <td>S</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>5</th>\n",
+       "      <td>0</td>\n",
+       "      <td>3</td>\n",
+       "      <td>Allen, Mr. William Henry</td>\n",
+       "      <td>male</td>\n",
+       "      <td>35.0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>373450</td>\n",
+       "      <td>8.0500</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>S</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "             Survived  Pclass  \\\n",
+       "PassengerId                     \n",
+       "1                   0       3   \n",
+       "2                   1       1   \n",
+       "3                   1       3   \n",
+       "4                   1       1   \n",
+       "5                   0       3   \n",
+       "\n",
+       "                                                          Name     Sex   Age  \\\n",
+       "PassengerId                                                                    \n",
+       "1                                      Braund, Mr. Owen Harris    male  22.0   \n",
+       "2            Cumings, Mrs. John Bradley (Florence Briggs Th...  female  38.0   \n",
+       "3                                       Heikkinen, Miss. Laina  female  26.0   \n",
+       "4                 Futrelle, Mrs. Jacques Heath (Lily May Peel)  female  35.0   \n",
+       "5                                     Allen, Mr. William Henry    male  35.0   \n",
+       "\n",
+       "             SibSp  Parch            Ticket     Fare Cabin Embarked  no_cabin  \n",
+       "PassengerId                                                                    \n",
+       "1                1      0         A/5 21171   7.2500   NaN        S         1  \n",
+       "2                1      0          PC 17599  71.2833   C85        C         0  \n",
+       "3                0      0  STON/O2. 3101282   7.9250   NaN        S         1  \n",
+       "4                1      0            113803  53.1000  C123        S         0  \n",
+       "5                0      0            373450   8.0500   NaN        S         1  "
+      ]
+     },
+     "execution_count": 18,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "id": "hazardous-appraisal",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Survived</th>\n",
+       "      <th>Pclass</th>\n",
+       "      <th>Name</th>\n",
+       "      <th>Sex</th>\n",
+       "      <th>Age</th>\n",
+       "      <th>SibSp</th>\n",
+       "      <th>Parch</th>\n",
+       "      <th>Ticket</th>\n",
+       "      <th>Fare</th>\n",
+       "      <th>Cabin</th>\n",
+       "      <th>Embarked</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>PassengerId</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>62</th>\n",
+       "      <td>1</td>\n",
+       "      <td>1</td>\n",
+       "      <td>Icard, Miss. Amelie</td>\n",
+       "      <td>female</td>\n",
+       "      <td>38.0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>113572</td>\n",
+       "      <td>80.0</td>\n",
+       "      <td>B28</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>830</th>\n",
+       "      <td>1</td>\n",
+       "      <td>1</td>\n",
+       "      <td>Stone, Mrs. George Nelson (Martha Evelyn)</td>\n",
+       "      <td>female</td>\n",
+       "      <td>62.0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>113572</td>\n",
+       "      <td>80.0</td>\n",
+       "      <td>B28</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "             Survived  Pclass                                       Name  \\\n",
+       "PassengerId                                                                \n",
+       "62                  1       1                        Icard, Miss. Amelie   \n",
+       "830                 1       1  Stone, Mrs. George Nelson (Martha Evelyn)   \n",
+       "\n",
+       "                Sex   Age  SibSp  Parch  Ticket  Fare Cabin Embarked  \n",
+       "PassengerId                                                           \n",
+       "62           female  38.0      0      0  113572  80.0   B28      NaN  \n",
+       "830          female  62.0      0      0  113572  80.0   B28      NaN  "
+      ]
+     },
+     "execution_count": 20,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df[pd.isnull(df.Embarked)]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "id": "reported-model",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Survived</th>\n",
+       "      <th>Pclass</th>\n",
+       "      <th>Name</th>\n",
+       "      <th>Sex</th>\n",
+       "      <th>Age</th>\n",
+       "      <th>SibSp</th>\n",
+       "      <th>Parch</th>\n",
+       "      <th>Ticket</th>\n",
+       "      <th>Fare</th>\n",
+       "      <th>Cabin</th>\n",
+       "      <th>Embarked</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>PassengerId</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>180</th>\n",
+       "      <td>0</td>\n",
+       "      <td>3</td>\n",
+       "      <td>Leonard, Mr. Lionel</td>\n",
+       "      <td>male</td>\n",
+       "      <td>36.0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>LINE</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>S</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>264</th>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>Harrison, Mr. William</td>\n",
+       "      <td>male</td>\n",
+       "      <td>40.0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>112059</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>B94</td>\n",
+       "      <td>S</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>272</th>\n",
+       "      <td>1</td>\n",
+       "      <td>3</td>\n",
+       "      <td>Tornquist, Mr. William Henry</td>\n",
+       "      <td>male</td>\n",
+       "      <td>25.0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>LINE</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>S</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>278</th>\n",
+       "      <td>0</td>\n",
+       "      <td>2</td>\n",
+       "      <td>Parkes, Mr. Francis \"Frank\"</td>\n",
+       "      <td>male</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>239853</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>S</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>303</th>\n",
+       "      <td>0</td>\n",
+       "      <td>3</td>\n",
+       "      <td>Johnson, Mr. William Cahoone Jr</td>\n",
+       "      <td>male</td>\n",
+       "      <td>19.0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>LINE</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>S</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>414</th>\n",
+       "      <td>0</td>\n",
+       "      <td>2</td>\n",
+       "      <td>Cunningham, Mr. Alfred Fleming</td>\n",
+       "      <td>male</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>239853</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>S</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>467</th>\n",
+       "      <td>0</td>\n",
+       "      <td>2</td>\n",
+       "      <td>Campbell, Mr. William</td>\n",
+       "      <td>male</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>239853</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>S</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>482</th>\n",
+       "      <td>0</td>\n",
+       "      <td>2</td>\n",
+       "      <td>Frost, Mr. Anthony Wood \"Archie\"</td>\n",
+       "      <td>male</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>239854</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>S</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>598</th>\n",
+       "      <td>0</td>\n",
+       "      <td>3</td>\n",
+       "      <td>Johnson, Mr. Alfred</td>\n",
+       "      <td>male</td>\n",
+       "      <td>49.0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>LINE</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>S</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>634</th>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>Parr, Mr. William Henry Marsh</td>\n",
+       "      <td>male</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>112052</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>S</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>675</th>\n",
+       "      <td>0</td>\n",
+       "      <td>2</td>\n",
+       "      <td>Watson, Mr. Ennis Hastings</td>\n",
+       "      <td>male</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>239856</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>S</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>733</th>\n",
+       "      <td>0</td>\n",
+       "      <td>2</td>\n",
+       "      <td>Knight, Mr. Robert J</td>\n",
+       "      <td>male</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>239855</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>S</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>807</th>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>Andrews, Mr. Thomas Jr</td>\n",
+       "      <td>male</td>\n",
+       "      <td>39.0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>112050</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>A36</td>\n",
+       "      <td>S</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>816</th>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>Fry, Mr. Richard</td>\n",
+       "      <td>male</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>112058</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>B102</td>\n",
+       "      <td>S</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>823</th>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>Reuchlin, Jonkheer. John George</td>\n",
+       "      <td>male</td>\n",
+       "      <td>38.0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>19972</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>S</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "             Survived  Pclass                              Name   Sex   Age  \\\n",
+       "PassengerId                                                                   \n",
+       "180                 0       3               Leonard, Mr. Lionel  male  36.0   \n",
+       "264                 0       1             Harrison, Mr. William  male  40.0   \n",
+       "272                 1       3      Tornquist, Mr. William Henry  male  25.0   \n",
+       "278                 0       2       Parkes, Mr. Francis \"Frank\"  male   NaN   \n",
+       "303                 0       3   Johnson, Mr. William Cahoone Jr  male  19.0   \n",
+       "414                 0       2    Cunningham, Mr. Alfred Fleming  male   NaN   \n",
+       "467                 0       2             Campbell, Mr. William  male   NaN   \n",
+       "482                 0       2  Frost, Mr. Anthony Wood \"Archie\"  male   NaN   \n",
+       "598                 0       3               Johnson, Mr. Alfred  male  49.0   \n",
+       "634                 0       1     Parr, Mr. William Henry Marsh  male   NaN   \n",
+       "675                 0       2        Watson, Mr. Ennis Hastings  male   NaN   \n",
+       "733                 0       2              Knight, Mr. Robert J  male   NaN   \n",
+       "807                 0       1            Andrews, Mr. Thomas Jr  male  39.0   \n",
+       "816                 0       1                  Fry, Mr. Richard  male   NaN   \n",
+       "823                 0       1   Reuchlin, Jonkheer. John George  male  38.0   \n",
+       "\n",
+       "             SibSp  Parch  Ticket  Fare Cabin Embarked  \n",
+       "PassengerId                                             \n",
+       "180              0      0    LINE   0.0   NaN        S  \n",
+       "264              0      0  112059   0.0   B94        S  \n",
+       "272              0      0    LINE   0.0   NaN        S  \n",
+       "278              0      0  239853   0.0   NaN        S  \n",
+       "303              0      0    LINE   0.0   NaN        S  \n",
+       "414              0      0  239853   0.0   NaN        S  \n",
+       "467              0      0  239853   0.0   NaN        S  \n",
+       "482              0      0  239854   0.0   NaN        S  \n",
+       "598              0      0    LINE   0.0   NaN        S  \n",
+       "634              0      0  112052   0.0   NaN        S  \n",
+       "675              0      0  239856   0.0   NaN        S  \n",
+       "733              0      0  239855   0.0   NaN        S  \n",
+       "807              0      0  112050   0.0   A36        S  \n",
+       "816              0      0  112058   0.0  B102        S  \n",
+       "823              0      0   19972   0.0   NaN        S  "
+      ]
+     },
+     "execution_count": 21,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df[df.Fare==0]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "id": "appreciated-constitution",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "<class 'pandas.core.frame.DataFrame'>\n",
+      "Int64Index: 891 entries, 1 to 891\n",
+      "Data columns (total 11 columns):\n",
+      " #   Column    Non-Null Count  Dtype  \n",
+      "---  ------    --------------  -----  \n",
+      " 0   Survived  891 non-null    int64  \n",
+      " 1   Pclass    891 non-null    int64  \n",
+      " 2   Name      891 non-null    object \n",
+      " 3   Sex       891 non-null    object \n",
+      " 4   Age       714 non-null    float64\n",
+      " 5   SibSp     891 non-null    int64  \n",
+      " 6   Parch     891 non-null    int64  \n",
+      " 7   Ticket    891 non-null    object \n",
+      " 8   Fare      891 non-null    float64\n",
+      " 9   Cabin     204 non-null    object \n",
+      " 10  Embarked  889 non-null    object \n",
+      "dtypes: float64(2), int64(4), object(5)\n",
+      "memory usage: 83.5+ KB\n"
+     ]
+    }
+   ],
+   "source": [
+    "df.info(verbose=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "id": "negative-satellite",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y_col = \"Survived\"\n",
+    "uids = [\"Cabin\", \"Ticket\", \"Name\"]\n",
+    "Xs_categorical = [\"Pclass\", \"Sex\", \"Embarked\"]\n",
+    "Xs_cont = [\"Age\", \"SibSp\", \"Parch\", \"Fare\"]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "median-hudson",
+   "metadata": {},
+   "source": [
+    "# What we need to accomplish\n",
+    "1. Fill nulls in age and embarked\n",
+    "2. Create feature from Cabin"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "id": "collect-climb",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.Age = df.Age.fillna(df.Age.mean())"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "id": "capable-authentication",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "S    644\n",
+       "C    168\n",
+       "Q     77\n",
+       "Name: Embarked, dtype: int64"
+      ]
+     },
+     "execution_count": 25,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.Embarked.value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "id": "smaller-virtue",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.Embarked = df.Embarked.fillna('S')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 27,
+   "id": "brave-muslim",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df['no_cabin'] = df.Cabin.isnull().astype(int)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "fifty-plaza",
+   "metadata": {},
+   "source": [
+    "# Deal with skewed fare value"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "id": "entitled-provincial",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "/Users/ajwilson/anaconda3/lib/python3.7/site-packages/seaborn/distributions.py:2557: FutureWarning: `distplot` is a deprecated function and will be removed in a future version. Please adapt your code to use either `displot` (a figure-level function with similar flexibility) or `histplot` (an axes-level function for histograms).\n",
+      "  warnings.warn(msg, FutureWarning)\n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "<AxesSubplot:xlabel='Fare', ylabel='Density'>"
+      ]
+     },
+     "execution_count": 28,
+     "metadata": {},
+     "output_type": "execute_result"
+    },
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<Figure size 432x288 with 1 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "sns.distplot(np.log1p(df.Fare))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "id": "based-worship",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "count    891.000000\n",
+       "mean      32.204208\n",
+       "std       49.693429\n",
+       "min        0.000000\n",
+       "25%        7.910400\n",
+       "50%       14.454200\n",
+       "75%       31.000000\n",
+       "max      512.329200\n",
+       "Name: Fare, dtype: float64"
+      ]
+     },
+     "execution_count": 29,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.Fare.describe()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 30,
+   "id": "located-yacht",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.Fare = np.log1p(df.Fare)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 33,
+   "id": "compliant-oracle",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y_col = \"Survived\"\n",
+    "Xs_categorical = [\"Pclass\", \"Sex\", \"Embarked\", \"no_cabin\"]\n",
+    "Xs_cont = [\"Age\", \"SibSp\", \"Parch\", \"Fare\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 36,
+   "id": "favorite-stand",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.Pclass = df.Pclass.astype(str)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 51,
+   "id": "theoretical-founder",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#df2 = pd.get_dummies(df[[y_col] + Xs_categorical + Xs_cont], drop_first=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 39,
+   "id": "excellent-recorder",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.preprocessing import StandardScaler"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 52,
+   "id": "narrative-riding",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y = df.Survived.values"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 53,
+   "id": "biological-spending",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(891,)"
+      ]
+     },
+     "execution_count": 53,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "y.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 54,
+   "id": "structural-calcium",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(891, 13)"
+      ]
+     },
+     "execution_count": 54,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "X = pd.get_dummies(df[Xs_categorical + Xs_cont]).values\n",
+    "X.shape"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "colored-alert",
+   "metadata": {},
+   "source": [
+    "X -> x1, x2, ... , x13"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 56,
+   "id": "descending-embassy",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_scaled = StandardScaler().fit_transform(X)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 57,
+   "id": "alleged-secretary",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.model_selection import train_test_split"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "retained-score",
+   "metadata": {},
+   "source": [
+    "# Three \"Chunks\" of data\n",
+    "1. Train - majority of the data\n",
+    "2. Validation - as you are training, check your work (as big as you can make it)\n",
+    "3. Test (interchangeable with validation) - hold to the very end to check final result (kaggle holdout) "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 58,
+   "id": "military-allergy",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.25, random_state=42)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 59,
+   "id": "binding-rouge",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "((668, 13), (223, 13), 0.3787425149700599, 0.3991031390134529)"
+      ]
+     },
+     "execution_count": 59,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "X_train.shape, X_test.shape, y_train.mean(), y_test.mean()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 60,
+   "id": "electric-alberta",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.ensemble import RandomForestClassifier"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "precious-flexibility",
+   "metadata": {},
+   "source": [
+    "decision tree:\n",
+    "\n",
+    "1. if age > 23 (right branch, left branch) \n",
+    "2 (right branch) if embarked_S == 1...\n",
+    "2 (left branch) if sex_female == 1....\n",
+    "\n",
+    "end of branch -> target = 1 or 0"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 62,
+   "id": "unknown-begin",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "   A1\tA0\n",
+      "P1[64\t20\t]\n",
+      "P0[25\t114\t]\n",
+      "\n",
+      "precision: 0.7619047619047619\n",
+      "recall: 0.7191011235955056\n",
+      "log loss: 6.969779953899482\n",
+      "type1 error: 20\n"
+     ]
+    }
+   ],
+   "source": [
+    "rfc = RandomForestClassifier(n_estimators=256, criterion='entropy', n_jobs=-1, random_state=42)\n",
+    "rfc.fit(X_train, y_train)\n",
+    "pred_y = rfc.predict(X_test)\n",
+    "\n",
+    "cm = sklearn.metrics.confusion_matrix(y_test, pred_y)\n",
+    "tn, fp, fn, tp = cm.ravel()\n",
+    "print('   A1\\tA0\\nP1[{}\\t{}\\t]\\nP0[{}\\t{}\\t]'.format(tp, fp, fn, tn), end='\\n\\n')\n",
+    "print(f'precision: {tp/(tp+fp)}')\n",
+    "print(f'recall: {tp/(tp+fn)}')\n",
+    "print(f'log loss: {sklearn.metrics.log_loss(y_test, pred_y)}')\n",
+    "print(f'type1 error: {fp}')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 66,
+   "id": "warming-microwave",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([0.03279373, 0.26345558, 0.05186184, 0.03978924, 0.26083609,\n",
+       "       0.01776553, 0.02267435, 0.04417906, 0.11351944, 0.11653042,\n",
+       "       0.01377887, 0.00821008, 0.01460578])"
+      ]
+     },
+     "execution_count": 66,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "rfc.feature_importances_"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "flexible-maple",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
